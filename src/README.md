@@ -25,4 +25,4 @@ The differences between these two transcripts will be labeled in a way that is n
 
 For example the tokens that are mutually different between the two transcripts (rather than a one-sided insertion) can be labeled `1` with all other tokens as `0`, and then trained on a token-level classification task to recognize such 'errors' in auto-generated transcripts. Subsequently, the `1`'s on these tokens can be replaced with a `<MASK>` and trained in a language modeling task, where the 'correct' token for the masked word could come from the 'manually corrected' transcript, rather than the auto-generated transcript. Here the goal is for a language model to learn to fill in a suitable alternative word, when an incorrect word is masked out of a caption.
 
-See this notebook for more details on the dataset and how to initially prepare it for such a training task.
+See the notebook `checkout_data_and_new_label_creation.ipynb` for more details on the dataset and how to initially prepare it for such a training task.
