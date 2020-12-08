@@ -7,3 +7,4 @@ data/transcripts/en/labeled_transcripts/Khan_Academy.json
 data/transcripts/en/labeled_transcripts/stanfordonline.json
 notebooks/dev_checkout_data_and_new_label_creation.ipynb
 .vscode/settings.json
+.vscode/launch.json

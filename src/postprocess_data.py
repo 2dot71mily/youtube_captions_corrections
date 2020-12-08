@@ -104,6 +104,8 @@ def prepare_postproc_transcripts(
 
     if config.USE_ONLY_POSTPROC_LABELS:
         transcripts=transcripts[['video_titles', 'playlist_ids', 'channel_ids', 'is_single_simple_diff', 'default_seq', 'correction_seq']] 
+    if not config.USE_VIDEO_ID_AS_IDX:
+        transcripts = transcripts.reset_index().rename(columns = {'index':'video_ids'}) 
         
     transcripts.to_json(str(PurePath(file_path, f"{file_name}.json")))
     return transcripts
