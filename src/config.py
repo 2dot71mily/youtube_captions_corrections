@@ -1,6 +1,7 @@
 from pathlib import PurePath
 
 ### Prefs ###
+DEVELOPER_KEY = "<API_KEY_HERE>"
 LANGUAGE = "en"
 CHANNEL_NAME = "Jeremy Howard"
 
@@ -12,7 +13,16 @@ SAVE_INTERVAL = 100
 TRANSCRIPT_SAVE_INTERVAL = SAVE_INTERVAL
 
 PRINT_TRANSCRIPT_API_ERR = False
-DEVELOPER_KEY = "<API_KEY_HERE>"
+USE_ONLY_POSTPROC_LABELS = True
+
+### Labels ##
+## prepare_data
+BOTH_AGREE = 0
+BOTH_DIFFER = 2
+AUTOGEN_INSERT = 1
+MANUAL_INSERT = -1
+## postprocess_data
+SIMPLE_SINGLE_DIFF_LABEL = 1
 
 ### Paths ###
 PATH_ROOT = "/Users/emcmilin/youtube_captions_corrections"
@@ -26,5 +36,7 @@ TRANSCRIPTS_PATH = PurePath(DATASET_PATH, "transcripts")
 LANG_PATH = PurePath(TRANSCRIPTS_PATH, LANGUAGE)
 RAW_TRANSCRIPT_PATH = PurePath(LANG_PATH, "raw_transcripts")
 LABELED_TRANSCRIPT_PATH = PurePath(LANG_PATH, "labeled_transcripts")
+POSTPROC_TRANSCRIPT_PATH = PurePath(LANG_PATH, "postproc_transcripts")
+
 COMBINED_LABELED_PATH =  PurePath(LABELED_TRANSCRIPT_PATH, "combined")
 COMBINED_LABELED_FILENAME = "all_channels_transcripts"

@@ -79,10 +79,7 @@ def generate_diff(transcript_texts):
 
 
 def label_diff_targets(transcript):
-    BOTH_AGREE = 0
-    BOTH_DIFFER = 2
-    AUTOGEN_INSERT = 1
-    MANUAL_INSERT = -1
+
 
     common_to_both_seq = []
     is_autogen_unique = []
@@ -99,8 +96,8 @@ def label_diff_targets(transcript):
                     tokens[AUTOGEN_UNIQUE]
                 )  # length of the neg sequence will be used as default len
                 common_to_both_seq.extend([""] * len_to_extend)
-                is_autogen_unique.extend([BOTH_DIFFER] * len_to_extend)
-                is_manual_unique.extend([BOTH_DIFFER] * len_to_extend)
+                is_autogen_unique.extend([config.BOTH_DIFFER] * len_to_extend)
+                is_manual_unique.extend([config.BOTH_DIFFER] * len_to_extend)
                 autogen_seq.extend(tokens[AUTOGEN_UNIQUE])
                 manual_seq.extend(
                     [" ".join(tokens[MANUAL_UNIQUE])] * len_to_extend
@@ -110,8 +107,8 @@ def label_diff_targets(transcript):
             elif len(tokens[AUTOGEN_UNIQUE]) > 0:
                 len_to_extend = len(tokens[AUTOGEN_UNIQUE])
                 common_to_both_seq.extend([""] * len_to_extend)
-                is_autogen_unique.extend([AUTOGEN_INSERT] * len_to_extend)
-                is_manual_unique.extend([AUTOGEN_INSERT] * len_to_extend)
+                is_autogen_unique.extend([config.AUTOGEN_INSERT] * len_to_extend)
+                is_manual_unique.extend([config.AUTOGEN_INSERT] * len_to_extend)
                 autogen_seq.extend(tokens[AUTOGEN_UNIQUE])
                 manual_seq.extend([""] * len_to_extend)
                 manual_addl_rep.extend([0] * len_to_extend)
@@ -120,16 +117,16 @@ def label_diff_targets(transcript):
                 # Append only single element, (of joined tokens if necessary)
                 # because we set len based on AUTOGEN_UNIQUE
                 common_to_both_seq.append("")
-                is_autogen_unique.append(MANUAL_INSERT)
-                is_manual_unique.append(MANUAL_INSERT)
+                is_autogen_unique.append(config.MANUAL_INSERT)
+                is_manual_unique.append(config.MANUAL_INSERT)
                 autogen_seq.append("")
                 manual_seq.append(" ".join(tokens[MANUAL_UNIQUE]))
                 manual_addl_rep.append(0)
 
         else:
             common_to_both_seq.append(tokens)
-            is_autogen_unique.append(BOTH_AGREE)
-            is_manual_unique.append(BOTH_AGREE)
+            is_autogen_unique.append(config.BOTH_AGREE)
+            is_manual_unique.append(config.BOTH_AGREE)
             autogen_seq.append("")
             manual_seq.append("")
             manual_addl_rep.append(0)
@@ -163,8 +160,9 @@ def prepare_labeled_transcripts(
         generate_diff, axis=1
     )
     transcripts = transcripts.apply(label_diff_targets, axis=1)
-
-    transcripts.to_json(str(PurePath(file_path, f"{file_name}.json")))
+    
+    transcripts.to_json(str(PurePath(file_path, f"{file_name}.json")))  
+    return transcripts
 
 
 def get_video_transcripts(channel_name, file_path, file_name, save_interval, lang):
@@ -172,7 +170,7 @@ def get_video_transcripts(channel_name, file_path, file_name, save_interval, lan
         request_data.get_transcripts,
         channel_name,
         file_path,
-        f"{file_name}",
+        file_name,
         save_interval=save_interval,
         lang=lang,
     )
@@ -184,7 +182,7 @@ def get_labeled_transcripts(raw_transcripts_df, file_path, file_name):
         prepare_labeled_transcripts,
         raw_transcripts_df,
         file_path,
-        f"{file_name}",
+        file_name,
     )
     return labeled_transcripts_df
 

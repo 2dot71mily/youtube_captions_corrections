@@ -295,7 +295,7 @@ def get_transcripts(channel_name, file_path, file_name, save_interval, lang):
         f"""
         If below requested channel is correct:
         https://www.youtube.com/channel/{channel_id}
-        please hit [Enter]/
+        please hit [Enter]
         
         Else [ctrl+c] script and check for other `channel_id` options in:
         {full_filename}
