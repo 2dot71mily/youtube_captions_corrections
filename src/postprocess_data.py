@@ -107,7 +107,7 @@ def prepare_postproc_transcripts(
     if not config.USE_VIDEO_ID_AS_IDX:
         transcripts = transcripts.reset_index().rename(columns = {'index':'video_ids'}) 
         
-    transcripts.to_json(str(PurePath(file_path, f"{file_name}.json")))
+    transcripts.to_json(str(PurePath(file_path, f"{file_name}.json")), orient='records')
     return transcripts
 
 def get_labeled_transcripts(channel_name, file_path, file_name):
