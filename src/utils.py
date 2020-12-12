@@ -37,26 +37,37 @@ def save_and_rem_files(df, file_path, file_name, i=0, save_interval=100, end=Fal
             file_to_rem.unlink()
 
 
-def concat_all_dataframes_in_dir(reading_path, writing_path, writing_filename):
+def split_files_by_lines(reading_path, writing_path, writing_filename, n_lines):
     path = Path(reading_path)
     print(f"reading from {reading_path}")
 
-    all_dfs = [pd.read_json(f) for f in path.iterdir() if f.is_file() and f.suffix.lower() =='.json']
-    df = pd.concat(all_dfs)
+    all_names = [
+        f.name for f in path.iterdir() if f.is_file() and f.suffix.lower() == ".json"
+    ]
+    all_dfs = [pd.read_json(str(PurePath(path, f_name))) for f_name in all_names]
+
+    df = pd.concat(all_dfs, ignore_index=True)
 
     dups = df[df.index.duplicated()].index
     df.drop(dups, inplace=True)
 
+    len_df = len(df)
+    chunks = list(range(0, len_df + 1, n_lines))
+    if chunks[-1] != len_df:
+        chunks.append(len_df)
+
     Path(writing_path).mkdir(parents=True, exist_ok=True)
-    full_filename = str(PurePath(writing_path, f"{writing_filename}.json"))
-    df.to_json(full_filename)
-    print(f"saved {full_filename}")
+    for i in range(len(chunks) - 1):
+        df.iloc[chunks[i] : chunks[i + 1]].to_json(
+            str(PurePath(writing_path, f"{writing_filename}_{i}.json"))
+        )
+    print(f"saved files to {writing_path}")
 
 
 if __name__ == "__main__":
-    
-    read_path = config.LABELED_TRANSCRIPT_PATH
-    write_path = config.COMBINED_LABELED_PATH
+
+    read_path = config.POSTPROC_TRANSCRIPT_PATH
+    write_path = config.SPLIT_LABELED_PATH
     input(
         f"""
         Running this file directly will concat all dfs together in: 
@@ -66,7 +77,7 @@ if __name__ == "__main__":
         [Ctrl+c] to quit or [Enter] to continue.
         """
     )
-    
-    concat_all_dataframes_in_dir(
-        read_path, config.COMBINED_LABELED_PATH, config.COMBINED_LABELED_FILENAME
+
+    split_files_by_lines(
+        read_path, write_path, config.SPLIT_LABELED_FILENAME, config.SPLIT_FILE_N_LINES
     )

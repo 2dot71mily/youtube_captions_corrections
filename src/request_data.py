@@ -17,6 +17,7 @@ YOUTUBE = discovery.build(
 RESULTS_PER_PAGE = 50  # 1-50 as per Google's rules.
 MAX_SIZE = 5000
 
+
 def look_up_resources(pages, requested_items):
     return_dict = {}
     for resource, loc in requested_items.items():

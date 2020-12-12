@@ -80,7 +80,6 @@ def generate_diff(transcript_texts):
 
 def label_diff_targets(transcript):
 
-
     common_to_both_seq = []
     is_autogen_unique = []
     is_manual_unique = []
@@ -160,8 +159,8 @@ def prepare_labeled_transcripts(
         generate_diff, axis=1
     )
     transcripts = transcripts.apply(label_diff_targets, axis=1)
-    
-    transcripts.to_json(str(PurePath(file_path, f"{file_name}.json")))  
+
+    transcripts.to_json(str(PurePath(file_path, f"{file_name}.json")))
     return transcripts
 
 

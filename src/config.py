@@ -4,7 +4,6 @@ from pathlib import PurePath
 DEVELOPER_KEY = "<API_KEY_HERE>"
 LANGUAGE = "en"
 CHANNEL_NAME = "Jeremy Howard"
-
 GET_CHANNEL_IDS_ONLY = False
 GET_PLAYLIST_IDS_ONLY = False
 GET_VIDEO_IDS_ONLY = False
@@ -16,7 +15,9 @@ PRINT_TRANSCRIPT_API_ERR = False
 USE_ONLY_POSTPROC_LABELS = True
 USE_VIDEO_ID_AS_IDX = False
 
-### Labels ##
+SPLIT_FILE_N_LINES = 500
+
+### Labels ###
 ## prepare_data
 BOTH_AGREE = 0
 BOTH_DIFFER = 2
@@ -39,5 +40,5 @@ RAW_TRANSCRIPT_PATH = PurePath(LANG_PATH, "raw_transcripts")
 LABELED_TRANSCRIPT_PATH = PurePath(LANG_PATH, "labeled_transcripts")
 POSTPROC_TRANSCRIPT_PATH = PurePath(LANG_PATH, "postproc_transcripts")
 
-COMBINED_LABELED_PATH =  PurePath(LABELED_TRANSCRIPT_PATH, "combined")
-COMBINED_LABELED_FILENAME = "all_channels_transcripts"
+SPLIT_LABELED_PATH = PurePath(LANG_PATH, "split")
+SPLIT_LABELED_FILENAME = "youtube_caption_corrections"

@@ -14,8 +14,9 @@ import config
 import utils
 import prepare_data
 
-nltk.download('stopwords')
+nltk.download("stopwords")
 SIMPLE_SINGLE_DIFF_LABEL = 1
+
 
 def get_autogen_reconstruct(example):
     autogen_reconstruct = []
@@ -41,74 +42,82 @@ def get_manual_reconstruct(example):
             manual_reconstruct.extend(example.manual_seq[i].split())
         elif labels[i] == config.BOTH_DIFFER:
             manual_reconstruct.extend(example.manual_seq[i].split())
-            i+=example.manual_addl_rep[i]
-        i+=1
-    return manual_reconstruct 
+            i += example.manual_addl_rep[i]
+        i += 1
+    return manual_reconstruct
 
 
 def add_simple_single_token_diff_labels(t, tokenizer, stemmer, en_stopwords):
-    REP_TARGET = 0 # looking for only a single token differences (no repetitions)
-    
-    default_seq = get_autogen_reconstruct(t)
-    correction_seq = [""]*len(t.autogen_seq)
-    new_labels = [0]*len(t.autogen_seq)
+    REP_TARGET = 0  # looking for only a single token differences (no repetitions)
 
-    
+    default_seq = get_autogen_reconstruct(t)
+    correction_seq = [""] * len(t.autogen_seq)
+    new_labels = [0] * len(t.autogen_seq)
+
     for idx in range(len(t.autogen_seq)):
         # Ingore if not a mutual single token difference
         if (
-            t.is_autogen_unique[idx] == config.BOTH_DIFFER  
-            and t.manual_addl_rep[idx] == REP_TARGET 
-            and len(t.manual_seq[idx].split()) == 1   
+            t.is_autogen_unique[idx] == config.BOTH_DIFFER
+            and t.manual_addl_rep[idx] == REP_TARGET
+            and len(t.manual_seq[idx].split()) == 1
         ):
             auto_token = t.autogen_seq[idx]
             man_token = t.manual_seq[idx]
-            
+
             if (
                 # Ignore if difference only case of puncuation
                 auto_token.lower() != man_token.lower()
-                and ''.join(tokenizer.tokenize(auto_token)) != ''.join(tokenizer.tokenize(man_token))
+                and "".join(tokenizer.tokenize(auto_token))
+                != "".join(tokenizer.tokenize(man_token))
                 # Ingore if shared stem or are 'uninteresting' stop words
                 and stemmer.stem(auto_token) != stemmer.stem(man_token)
-                and auto_token.lower() not in en_stopwords 
-                and man_token.lower() not in en_stopwords 
+                and auto_token.lower() not in en_stopwords
+                and man_token.lower() not in en_stopwords
                 # Ignore digits: e.g. `2` <-> `two` is a common diff
-                and not re.match("\d+", man_token)  
+                and not re.match("\d+", man_token)
                 and not re.match("\d+", auto_token)
                 # Ignore if intra/inter-word puncuation and case
-                and ''.join(tokenizer.tokenize(auto_token)).lower().strip(punctuation) 
-                != ''.join(tokenizer.tokenize(man_token)).lower().strip(punctuation) 
+                and "".join(tokenizer.tokenize(auto_token)).lower().strip(punctuation)
+                != "".join(tokenizer.tokenize(man_token)).lower().strip(punctuation)
             ):
                 new_labels[idx] = config.SIMPLE_SINGLE_DIFF_LABEL
                 correction_seq[idx] = man_token
 
-    t['is_single_simple_diff'] = new_labels
-    t['default_seq'] = default_seq
-    t['correction_seq'] = correction_seq
+    t["is_single_simple_diff"] = new_labels
+    t["default_seq"] = default_seq
+    t["correction_seq"] = correction_seq
     return t
 
 
-def prepare_postproc_transcripts(
-        labeled_transcripts_df, file_path, file_name
-    ): 
-    
+def prepare_postproc_transcripts(labeled_transcripts_df, file_path, file_name):
+
     tokenizer = nltk.RegexpTokenizer(r"\w+")
     stemmer = PorterStemmer()
     en_stopwords = stopwords.words("english")
 
     transcripts = labeled_transcripts_df.apply(
-            add_simple_single_token_diff_labels, 
-            axis=1, 
-            args=(tokenizer, stemmer, en_stopwords)
-        )
+        add_simple_single_token_diff_labels,
+        axis=1,
+        args=(tokenizer, stemmer, en_stopwords),
+    )
 
     if config.USE_ONLY_POSTPROC_LABELS:
-        transcripts=transcripts[['video_titles', 'playlist_ids', 'channel_ids', 'is_single_simple_diff', 'default_seq', 'correction_seq']] 
+        transcripts = transcripts[
+            [
+                "video_titles",
+                "playlist_ids",
+                "channel_ids",
+                "is_single_simple_diff",
+                "default_seq",
+                "correction_seq",
+            ]
+        ]
     if not config.USE_VIDEO_ID_AS_IDX:
-        transcripts = transcripts.reset_index().rename(columns = {'index':'video_ids'}) 
-        
-    transcripts.to_json(str(PurePath(file_path, f"{file_name}.json")), orient='records')
+        transcripts = transcripts.reset_index().rename(columns={"index": "video_ids"})
+
+    transcripts.to_json(str(PurePath(file_path, f"{file_name}.json")), orient="records")
     return transcripts
+
 
 def get_labeled_transcripts(channel_name, file_path, file_name):
     labeled_transcripts_df = utils.open_file_or_create(
@@ -119,6 +128,7 @@ def get_labeled_transcripts(channel_name, file_path, file_name):
     )
     return labeled_transcripts_df
 
+
 def get_postproc_transcripts(raw_transcripts_df, file_path, file_name):
     postproc_transcripts_df = utils.open_file_or_create(
         prepare_postproc_transcripts,
@@ -127,6 +137,7 @@ def get_postproc_transcripts(raw_transcripts_df, file_path, file_name):
         file_name,
     )
     return postproc_transcripts_df
+
 
 if __name__ == "__main__":
 
@@ -144,8 +155,7 @@ if __name__ == "__main__":
     labeled_transcripts_df = get_labeled_transcripts(
         raw_transcripts_df, config.LABELED_TRANSCRIPT_PATH, file_name
     )
- 
+
     postproc_transcripts_df = get_postproc_transcripts(
         labeled_transcripts_df, config.POSTPROC_TRANSCRIPT_PATH, file_name
-    )    
-    
+    )
