@@ -94,7 +94,7 @@ def add_simple_single_token_diff_labels(t, tokenizer, stemmer, en_stopwords):
 
             correction_seq[idx] = man_token
 
-    t["is_single_simple_diff"] = new_labels
+    t["diff_type"] = new_labels
     t["default_seq"] = default_seq
     t["correction_seq"] = correction_seq
     return t
@@ -118,7 +118,7 @@ def prepare_postproc_transcripts(labeled_transcripts_df, file_path, file_name):
                 "video_titles",
                 "playlist_ids",
                 "channel_ids",
-                "is_single_simple_diff",
+                "diff_type",
                 "default_seq",
                 "correction_seq",
             ]
