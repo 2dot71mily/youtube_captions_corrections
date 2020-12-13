@@ -47,7 +47,7 @@ TRANSCRIPTS_PATH = PurePath(DATASET_PATH, "transcripts")
 LANG_PATH = PurePath(TRANSCRIPTS_PATH, LANGUAGE)
 RAW_TRANSCRIPT_PATH = PurePath(LANG_PATH, "raw_transcripts")
 LABELED_TRANSCRIPT_PATH = PurePath(LANG_PATH, "labeled_transcripts")
-POSTPROC_TRANSCRIPT_PATH = PurePath(LANG_PATH, "postproc2_transcripts")
+POSTPROC_TRANSCRIPT_PATH = PurePath(LANG_PATH, "postproc_transcripts")
 
 SPLIT_LABELED_PATH = PurePath(LANG_PATH, "split")
 SPLIT_LABELED_FILENAME = "youtube_caption_corrections"

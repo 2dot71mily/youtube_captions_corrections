@@ -56,7 +56,7 @@ def add_simple_single_token_diff_labels(t, tokenizer, stemmer, en_stopwords):
 
             auto_token = t.autogen_seq[idx]
             # num reps == num additional reps +1
-            n_reps = t.manual_addl_rep[idx] + 1  
+            n_reps = t.manual_addl_rep[idx] + 1
             # Is same number of tokens different in both sequences
             if len(t.manual_seq[idx].split()) == n_reps:
                 # If any address addl tokens, address in next iters

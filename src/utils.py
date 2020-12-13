@@ -59,7 +59,8 @@ def split_files_by_lines(reading_path, writing_path, writing_filename, n_lines):
     Path(writing_path).mkdir(parents=True, exist_ok=True)
     for i in range(len(chunks) - 1):
         df.iloc[chunks[i] : chunks[i + 1]].to_json(
-            str(PurePath(writing_path, f"{writing_filename}_{i}.json"))
+            str(PurePath(writing_path, f"{writing_filename}_{i}.json")),
+            orient="records",
         )
     print(f"saved files to {writing_path}")
 
