@@ -3,7 +3,7 @@ import sys
 import pandas as pd
 
 from googleapiclient import discovery
-from pathlib import PurePath, Path
+from pathlib import PurePath
 from youtube_transcript_api import YouTubeTranscriptApi
 
 import config, utils

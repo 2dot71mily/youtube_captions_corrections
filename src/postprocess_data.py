@@ -1,8 +1,6 @@
-import pandas as pd
-import numpy as np
+import argparse
 import re
 import nltk
-import torch
 
 from nltk.corpus import stopwords
 from nltk.stem.porter import PorterStemmer
@@ -15,7 +13,6 @@ import utils
 import prepare_data
 
 nltk.download("stopwords")
-SIMPLE_SINGLE_DIFF_LABEL = 1
 
 
 def get_autogen_reconstruct(example):
@@ -48,40 +45,54 @@ def get_manual_reconstruct(example):
 
 
 def add_simple_single_token_diff_labels(t, tokenizer, stemmer, en_stopwords):
-    REP_TARGET = 0  # looking for only a single token differences (no repetitions)
 
     default_seq = get_autogen_reconstruct(t)
     correction_seq = [""] * len(t.autogen_seq)
     new_labels = [0] * len(t.autogen_seq)
 
     for idx in range(len(t.autogen_seq)):
-        # Ingore if not a mutual single token difference
-        if (
-            t.is_autogen_unique[idx] == config.BOTH_DIFFER
-            and t.manual_addl_rep[idx] == REP_TARGET
-            and len(t.manual_seq[idx].split()) == 1
-        ):
+        # Ingore if not a mutual token difference
+        if t.is_autogen_unique[idx] == config.BOTH_DIFFER:
+
             auto_token = t.autogen_seq[idx]
+            # num reps == num additional reps +1
+            n_reps = t.manual_addl_rep[idx] + 1  
+            # Is same number of tokens different in both sequences
+            if len(t.manual_seq[idx].split()) == n_reps:
+                # If any address addl tokens, address in next iters
+                t.manual_seq[idx : idx + n_reps] = t.manual_seq[idx].split()
+                t.manual_addl_rep[idx : idx + n_reps] = [0] * n_reps
+            else:
+                continue  # Only labeling same len token diffs
             man_token = t.manual_seq[idx]
 
-            if (
-                # Ignore if difference only case of puncuation
-                auto_token.lower() != man_token.lower()
-                and "".join(tokenizer.tokenize(auto_token))
-                != "".join(tokenizer.tokenize(man_token))
-                # Ingore if shared stem or are 'uninteresting' stop words
-                and stemmer.stem(auto_token) != stemmer.stem(man_token)
-                and auto_token.lower() not in en_stopwords
-                and man_token.lower() not in en_stopwords
-                # Ignore digits: e.g. `2` <-> `two` is a common diff
-                and not re.match("\d+", man_token)
-                and not re.match("\d+", auto_token)
-                # Ignore if intra/inter-word puncuation and case
-                and "".join(tokenizer.tokenize(auto_token)).lower().strip(punctuation)
-                != "".join(tokenizer.tokenize(man_token)).lower().strip(punctuation)
+            if auto_token.lower() == man_token.lower():
+                new_labels[idx] = config.CASE_DIFF
+
+            elif auto_token.strip(punctuation) == man_token.strip(punctuation):
+                new_labels[idx] = config.PUNCUATION_DIFF
+
+            elif auto_token.lower().strip(punctuation) == man_token.lower().strip(
+                punctuation
             ):
-                new_labels[idx] = config.SIMPLE_SINGLE_DIFF_LABEL
-                correction_seq[idx] = man_token
+                new_labels[idx] = config.CASE_AND_PUNCUATION_DIFF
+
+            elif stemmer.stem(auto_token.lower()) == stemmer.stem(man_token.lower()):
+                new_labels[idx] = config.STEM_BASED_DIFF
+
+            #  E.g. `2` <-> `two` is a common diff
+            elif re.match("\d+", man_token) or re.match("\d+", auto_token):
+                new_labels[idx] = config.DIGIT_DIFF
+
+            elif "".join(tokenizer.tokenize(auto_token)).lower().strip(
+                punctuation
+            ) == "".join(tokenizer.tokenize(man_token)).lower().strip(punctuation):
+                new_labels[idx] = config.INTRAWORD_PUNC_DIFF
+
+            else:
+                new_labels[idx] = config.UNKNOWN_TYPE_DIFF
+
+            correction_seq[idx] = man_token
 
     t["is_single_simple_diff"] = new_labels
     t["default_seq"] = default_seq
@@ -140,8 +151,19 @@ def get_postproc_transcripts(raw_transcripts_df, file_path, file_name):
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
 
-    channel_name = config.CHANNEL_NAME
+    parser.add_argument(
+        "-c", "--channel", action="store", default=None, help="YouTube channel name"
+    )
+
+    args = parser.parse_args()
+
+    if args.channel == None:
+        channel_name = config.CHANNEL_NAME
+    else:
+        channel_name = args.channel
+
     file_name = "_".join(channel_name.split())
 
     raw_transcripts_df = prepare_data.get_video_transcripts(

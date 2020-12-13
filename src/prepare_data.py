@@ -1,6 +1,4 @@
-import pandas as pd
-
-from pathlib import PurePath, Path
+from pathlib import PurePath
 from difflib import Differ
 
 import config
@@ -14,7 +12,6 @@ MANUAL_UNIQUE = "+"
 
 def extract_text(transcript):
     try:
-        start = 0
         last_line = transcript[-1]["start"]
         text = []
         for line in transcript:
