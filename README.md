@@ -28,7 +28,7 @@ The differences between these two transcripts will be labeled in a way that is n
 
 For example the tokens that are mutually different between the two transcripts (rather than a one-sided insertion) can be labeled `1` with all other tokens as `0`, and then trained on a token-level classification task to recognize such 'errors' in auto-generated transcripts. Subsequently, the `1`'s on these tokens can be replaced with a `<MASK>` and trained in a language modeling task, where the 'correct' token for the masked word could come from the 'manually corrected' transcript, rather than the auto-generated transcript. Here the goal is for a language model to learn to fill in a suitable alternative word, when an incorrect word is masked out of a caption.
 
-See the notebook `checkout_data_and_new_label_creation.ipynb` for more details on the dataset and how to initially prepare it for such a training task.
+See the notebook [`checkout_data_and_new_label_creation.ipynb`](./notebooks/demo_checkout_data_and_new_label_creation.ipynb) for more details on the dataset and how to initially prepare it for such a training task.
 
 
 ## Applications
@@ -38,4 +38,4 @@ One example application that was prepared as part of a [MLC Research Jam](https:
 
 Colab for this initial token classification model and its results are [here](https://colab.research.google.com/drive/1rXvkNF_ufWqFLsA_UzJMD2wBtkFhg-Z5?usp=sharing).
 
-The MLC presentation, which also provides an overview for this dataset as well, can be found [here].
+The MLC presentation, which also provides an overview for this dataset as well, can be found [here](./notebooks/subset_youtube_captions_mlc_research_jam_preso.pdf).
