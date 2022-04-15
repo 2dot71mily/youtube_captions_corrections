@@ -15,7 +15,8 @@ To request transcripts from a youtube channel, populate `CHANNEL_NAME` in config
 
 The script will do a search for this channel name and come back with a list of potential channel_ids, suggesting the top-most. Please click on weblink to confirm that you want to proceed with this channel. Note that all data return from calls to the YouTube API, both directly via the [`googleapiclient`](https://developers.google.com/youtube/v3/quickstart/python) and indirectly via [`youtube_transcript_api`](https://pypi.org/project/youtube-transcript-api/) are backed up incrementally to reduce the likelihood that you have to re-request the same data and risk hitting your daily request limit (but you still don't want to waste a bunch of time on the wrong channel).
 
-Please see an example of this in [colab](https://colab.research.google.com/drive/1z9NseWBYXlUn85fHVQaKU7FVGbYfuLCF?usp=sharing).
+See a colab notebook example of how to [scrape a new YouTube channel or update an existing one](./notebooks/adding_or_updating_youtube_channel_to_yt_caption_corrections_dataset.ipynb).
+
 
 
 ## Output
@@ -28,14 +29,12 @@ The differences between these two transcripts will be labeled in a way that is n
 
 For example the tokens that are mutually different between the two transcripts (rather than a one-sided insertion) can be labeled `1` with all other tokens as `0`, and then trained on a token-level classification task to recognize such 'errors' in auto-generated transcripts. Subsequently, the `1`'s on these tokens can be replaced with a `<MASK>` and trained in a language modeling task, where the 'correct' token for the masked word could come from the 'manually corrected' transcript, rather than the auto-generated transcript. Here the goal is for a language model to learn to fill in a suitable alternative word, when an incorrect word is masked out of a caption.
 
-See the notebook [`checkout_data_and_new_label_creation.ipynb`](./notebooks/demo_checkout_data_and_new_label_creation.ipynb) for more details on the dataset and how to initially prepare it for such a training task.
+See the colab notebook [`checkout_data_and_new_label_creation.ipynb`](./notebooks/demo_checkout_data_and_new_label_creation.ipynb) for more details on the dataset and how to initially prepare it for such a training task.
 
 
 ## Applications
 A portion of this dataset has been contributed to Hugging Face's Datasets library for ease of use, with details [here](https://huggingface.co/datasets/youtube_caption_corrections).
 
-One example application that was prepared as part of a [MLC Research Jam](https://mlcollective.org/events/#jam) presentation is token classification of the masked out YouTube errors (and their error-type).
+One example application that was prepared as part of a [MLC Research Jam](https://mlcollective.org/events/#jam) presentation is token classification of the masked out YouTube errors (and their error-type).  See a colab notebook example of this [token classification model](./notebooks/youtube_captions_multi_classification_example.ipynb).
 
-Colab for this initial token classification model and its results are [here](https://colab.research.google.com/drive/1rXvkNF_ufWqFLsA_UzJMD2wBtkFhg-Z5?usp=sharing).
-
-The MLC presentation, which also provides an overview for this dataset as well, can be found [here](./notebooks/subset_youtube_captions_mlc_research_jam_preso.pdf).
+Finally, check out slides for the [MLC presentation](./notebooks/subset_youtube_captions_mlc_research_jam_preso.pdf), which also provides an overview for this dataset as well.
